@@ -20,32 +20,37 @@ export class BalanceIsNegativeException extends Error {
 }
 
 export class Transaction {
-    date: Date;
-    amount: number;
-    balance: number;
+    constructor(private _date: Date, private _amount: number, private _balance: number) {}
 
-    constructor(date: Date, amount: number, balance: number) {
-        this.date = date;
-        this.amount = amount;
-        this.balance = balance;
+    get date(): Date {
+        return this._date;
     }
+
+    get amount(): number {
+        return this._amount;
+    }
+
+    get balance(): number {
+        return this._balance;
+    }
+
 }
 
 export class Account {
 
-    private transactions: Transaction[]
+    private _transactions: Transaction[]
 
-    constructor(private balance: number) {
-        if (balance < 0) {
+    constructor(private _balance: number) {
+        if (_balance < 0) {
             throw new BalanceIsNegativeException("Initial balance cannot be negative");
         }
-        this.transactions = [];
+        this._transactions = [];
     }
 
     deposit(amount: number): void {
         this.validateAmount(amount)
-        this.balance += amount;
-        this.transactions.push(new Transaction(new Date(), amount, this.balance));
+        this._balance += amount;
+        this._transactions.push(new Transaction(new Date(), amount, this._balance));
     }
 
     withdraw(amount: number): void {
@@ -53,24 +58,24 @@ export class Account {
         if (amount > this.balance) {
             throw new NotEnoughInBalanceException("Insufficient funds");
         }
-        this.balance -= amount;
-        this.transactions.push(new Transaction(new Date(), -amount, this.balance));
+        this._balance -= amount;
+        this._transactions.push(new Transaction(new Date(), -amount, this._balance));
     }
 
     printStatement(): string {
         let statement = "Date        Amount  Balance\n";
-        this.transactions.forEach(transaction => {
+        this._transactions.forEach(transaction => {
             statement += `${transaction.date.toLocaleDateString()}   ${transaction.amount >= 0 ? '+' : '-'}${Math.abs(transaction.amount)}      ${transaction.balance}\n`;
         });
         return statement;
     }
 
-    getBalance(): number {
-        return this.balance;
+    get balance(): number {
+        return this._balance;
     }
 
-    getTransactions(): Transaction[] {
-        return this.transactions;
+    get transactions(): Transaction[] {
+        return this._transactions;
     }
 
     private validateAmount(amount: number): void {

@@ -4,7 +4,6 @@ import {
     NotEnoughInBalanceException,
     AmountIsNegativeException,
     BalanceIsNegativeException,
-    Transaction 
 } from '../src/main'
 
 describe('Account class', () => {
@@ -17,21 +16,32 @@ describe('Account class', () => {
     describe('Account - deposit()', () => {
         it("should deposit money into the account", () => {
             account.deposit(50);
-            expect(account.getBalance()).to.equal(150);
+            expect(account.balance).to.equal(150);
+            const transactions = account.transactions;
+            expect(transactions.length).to.be.equal(1);
+            const transaction = transactions[0];
+            expect(transaction.amount).to.be.equal(50); 
+            expect(transaction.balance).to.be.equal(150); 
         });
+
         it("should not allow negative deposit amount", () => {
             expect(() => account.deposit(-50)).to.throw(AmountIsNegativeException);
         });
     })
 
     describe('Account - withdraw()', () => {
-        it("should not allow withdrawal of more money than the account balance", () => {
-            expect(() => account.withdraw(150)).to.throw(NotEnoughInBalanceException);
-        });
-
         it("should withdraw money from the account", () => {
             account.withdraw(50);
-            expect(account.getBalance()).to.equal(50);
+            expect(account.balance).to.equal(50);
+            const transactions = account.transactions;
+            expect(transactions.length).to.be.equal(1); 
+            const transaction = transactions[0];
+            expect(transaction.amount).to.be.equal(-50); 
+            expect(transaction.balance).to.be.equal(50);
+        });
+
+        it("should not allow withdrawal of more money than the account balance", () => {
+            expect(() => account.withdraw(150)).to.throw(NotEnoughInBalanceException);
         });
 
         it("should not allow negative withdrawal amount", () => {
@@ -51,6 +61,6 @@ describe('Account class', () => {
     })
 
     it('should throw an error when trying to create an account with a negative balance', () => {
-        expect(() => new Account(-500)).to.throw(BalanceIsNegativeException); // Vérifie qu'une exception est lancée
+        expect(() => new Account(-500)).to.throw(BalanceIsNegativeException);
     });
 })
